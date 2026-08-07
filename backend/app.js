@@ -1,6 +1,8 @@
 import express from "express";
 import { dbConnection } from "./database/dbConnection.js";
 import { config } from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import fileUpload from "express-fileupload";
@@ -9,8 +11,11 @@ import messageRouter from "./router/messageRouter.js";
 import userRouter from "./router/userRouter.js";
 import appointmentRouter from "./router/appointmentRouter.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
-config({ path: "./config.env" });
+config({ path: path.resolve(__dirname, "./config.env") });
 
 app.use(
   cors({
