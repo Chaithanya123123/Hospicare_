@@ -8,56 +8,58 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 config({ path: path.resolve(__dirname, "./config.env") });
 
-const admins = [
-  {
-    firstName: "Chaithu",
-    lastName: "Admin",
-    email: "chaithu@gmail.com",
-    phone: "98765432101",
-    nic: "1234567890123",
-    dob: new Date("1995-01-15"),
-    gender: "Male",
-    password: "12345678",
-    role: "Admin",
-  },
-  {
-    firstName: "Sai",
-    lastName: "Admin",
-    email: "sai@gmail.com",
-    phone: "98765432102",
-    nic: "1234567890124",
-    dob: new Date("1996-06-20"),
-    gender: "Male",
-    password: "12345678",
-    role: "Admin",
-  },
+// Admin details come from the environment so no credentials live in git.
+// See config.env.example for the full list.
+const REQUIRED = [
+  "MONGO_URI",
+  "ADMIN_FIRST_NAME",
+  "ADMIN_LAST_NAME",
+  "ADMIN_EMAIL",
+  "ADMIN_PHONE",
+  "ADMIN_NIC",
+  "ADMIN_DOB",
+  "ADMIN_GENDER",
+  "ADMIN_PASSWORD",
 ];
 
-async function seedAdmins() {
+const missing = REQUIRED.filter((name) => !process.env[name]);
+if (missing.length > 0) {
+  console.error(`Seed failed: missing ${missing.join(", ")}`);
+  process.exit(1);
+}
+
+const admin = {
+  firstName: process.env.ADMIN_FIRST_NAME,
+  lastName: process.env.ADMIN_LAST_NAME,
+  email: process.env.ADMIN_EMAIL,
+  phone: process.env.ADMIN_PHONE,
+  nic: process.env.ADMIN_NIC,
+  dob: new Date(process.env.ADMIN_DOB),
+  gender: process.env.ADMIN_GENDER,
+  password: process.env.ADMIN_PASSWORD,
+  role: "Admin",
+};
+
+async function seedAdmin() {
+  let exitCode = 0;
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       dbName: "MERN_STACK_HOSPITAL_MANAGEMENT_SYSTEM_DEPLOYED",
     });
-    console.log("Connected to MongoDB");
 
-    for (const admin of admins) {
-      const existing = await User.findOne({ email: admin.email });
-      if (existing) {
-        console.log(`Admin already exists: ${admin.email}`);
-        continue;
-      }
+    if (await User.findOne({ email: admin.email })) {
+      console.log("Admin already exists");
+    } else {
       await User.create(admin);
-      console.log(`Admin created: ${admin.email}`);
+      console.log("Admin created");
     }
-
-    console.log("Seed completed successfully");
   } catch (error) {
     console.error("Seed failed:", error.message);
-    process.exit(1);
+    exitCode = 1;
   } finally {
     await mongoose.disconnect();
-    process.exit(0);
+    process.exit(exitCode);
   }
 }
 
-seedAdmins();
+seedAdmin();
