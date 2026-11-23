@@ -95,11 +95,15 @@ export const updateAppointmentStatus = catchAsyncErrors(
     if (!appointment) {
       return next(new ErrorHandler("Appointment not found!", 404));
     }
-    appointment = await Appointment.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-      useFindAndModify: false,
-    });
+    const { status } = req.body;
+    if (!status) {
+      return next(new ErrorHandler("Status Is Required!", 400));
+    }
+    appointment = await Appointment.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true, runValidators: true }
+    );
     res.status(200).json({
       success: true,
       message: "Appointment Status Updated!",

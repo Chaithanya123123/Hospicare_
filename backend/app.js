@@ -1,6 +1,8 @@
 import express from "express";
+import mongoose from "mongoose";
 import { dbConnection } from "./database/dbConnection.js";
 import { config } from "dotenv";
+import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
@@ -19,8 +21,10 @@ config({ path: path.resolve(__dirname, "./config.env") });
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL_ONE, process.env.FRONTEND_URL_TWO],
-    method: ["GET", "POST", "DELETE", "PUT"],
+    origin: [process.env.FRONTEND_URL_ONE, process.env.FRONTEND_URL_TWO].filter(
+      Boolean
+    ),
+    methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
   })
 );
@@ -32,9 +36,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   fileUpload({
     useTempFiles: true,
-    tempFileDir: "/tmp/",
+    tempFileDir: os.tmpdir(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    abortOnLimit: true,
   })
 );
+app.get("/health", (req, res) => {
+  res.json({ success: true, database: mongoose.connection.readyState === 1 });
+});
 app.use("/api/v1/message", messageRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/appointment", appointmentRouter);

@@ -1,3 +1,4 @@
+import { API_URL, errorMessage } from "../api";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -11,12 +12,12 @@ const Doctors = () => {
     const fetchDoctors = async () => {
       try {
         const { data } = await axios.get(
-          "http://localhost:5000/api/v1/user/doctors",
+          `${API_URL}/api/v1/user/doctors`,
           { withCredentials: true }
         );
         setDoctors(data.doctors);
       } catch (error) {
-        toast.error(error.response.data.message);
+        toast.error(errorMessage(error));
       }
     };
     fetchDoctors();

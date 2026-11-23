@@ -10,6 +10,7 @@ This project is based on [MERN-Stack-Hospital-Management-System-Web-Application]
 
 - Dockerfiles for the backend, frontend and dashboard
 - GitHub Actions pipeline to test, build and publish images
+- Configurable API address, clearer connection errors, and real dashboard counts
 - Optional Cloudinary: doctors can be added without image upload configured
 - Environment-based admin seed script, and config loading that works from any directory
 
@@ -36,4 +37,8 @@ In separate terminals, run `npm install && npm run dev` in `frontend/` and `dash
 
 ## Tests
 
-`npm test` in `backend/` currently runs only a placeholder sanity check.
+`npm test` in `backend/` covers error handling and cookie settings.
+
+## Deploying
+
+Set `VITE_API_URL` when building `frontend/` and `dashboard/`. If they are on a different domain from the API, also set `COOKIE_CROSS_SITE=true` on the API and serve everything over https.

@@ -1,3 +1,4 @@
+import { API_URL, errorMessage } from "../api";
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -11,7 +12,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     await axios
-      .get("http://localhost:5000/api/v1/user/patient/logout", {
+      .get(`${API_URL}/api/v1/user/patient/logout`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -19,7 +20,7 @@ const Navbar = () => {
         setIsAuthenticated(false);
       })
       .catch((err) => {
-        toast.error(err.response.data.message);
+        toast.error(errorMessage(err));
       });
   };
 

@@ -1,3 +1,4 @@
+import { API_URL, errorMessage } from "../api";
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
@@ -23,7 +24,7 @@ const Register = () => {
     try {
       await axios
         .post(
-          "http://localhost:5000/api/v1/user/patient/register",
+          `${API_URL}/api/v1/user/patient/register`,
           { firstName, lastName, email, phone, nic, dob, gender, password },
           {
             withCredentials: true,
@@ -44,7 +45,7 @@ const Register = () => {
           setPassword("");
         });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(errorMessage(error));
     }
   };
 

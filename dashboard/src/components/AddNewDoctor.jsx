@@ -1,3 +1,4 @@
+import { API_URL, errorMessage } from "../api";
 import React, { useContext, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -58,7 +59,7 @@ const AddNewDoctor = () => {
       formData.append("doctorDepartment", doctorDepartment);
       formData.append("docAvatar", docAvatar);
       await axios
-        .post("http://localhost:5000/api/v1/user/doctor/addnew", formData, {
+        .post(`${API_URL}/api/v1/user/doctor/addnew`, formData, {
           withCredentials: true,
           headers: { "Content-Type": "multipart/form-data" },
         })
@@ -76,7 +77,7 @@ const AddNewDoctor = () => {
           setPassword("");
         });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(errorMessage(error));
     }
   };
 

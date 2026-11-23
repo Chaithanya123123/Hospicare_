@@ -1,3 +1,4 @@
+import { API_URL, errorMessage } from "../api";
 import React, { useContext, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -18,7 +19,7 @@ const Login = () => {
     try {
       await axios
         .post(
-          "http://localhost:5000/api/v1/user/login",
+          `${API_URL}/api/v1/user/login`,
           { email, password, confirmPassword, role: "Admin" },
           {
             withCredentials: true,
@@ -34,7 +35,7 @@ const Login = () => {
           setConfirmPassword("");
         });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(errorMessage(error));
     }
   };
 

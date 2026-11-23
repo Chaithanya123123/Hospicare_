@@ -2,6 +2,7 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { User } from "../models/userSchema.js";
 import ErrorHandler from "../middlewares/error.js";
 import { generateToken } from "../utils/jwtToken.js";
+import { cookieOptions } from "../utils/cookieOptions.js";
 import cloudinary from "cloudinary";
 
 export const patientRegister = catchAsyncErrors(async (req, res, next) => {
@@ -218,7 +219,7 @@ export const logoutAdmin = catchAsyncErrors(async (req, res, next) => {
   res
     .status(201)
     .cookie("adminToken", "", {
-      httpOnly: true,
+      ...cookieOptions(),
       expires: new Date(Date.now()),
     })
     .json({
@@ -232,7 +233,7 @@ export const logoutPatient = catchAsyncErrors(async (req, res, next) => {
   res
     .status(201)
     .cookie("patientToken", "", {
-      httpOnly: true,
+      ...cookieOptions(),
       expires: new Date(Date.now()),
     })
     .json({

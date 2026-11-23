@@ -1,3 +1,4 @@
+import { API_URL, errorMessage } from "../api";
 import React, { useContext, useState } from "react";
 import { Context } from "../main";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -23,7 +24,7 @@ const AddNewAdmin = () => {
     try {
       await axios
         .post(
-          "http://localhost:5000/api/v1/user/admin/addnew",
+          `${API_URL}/api/v1/user/admin/addnew`,
           { firstName, lastName, email, phone, nic, dob, gender, password },
           {
             withCredentials: true,
@@ -44,7 +45,7 @@ const AddNewAdmin = () => {
           setPassword("");
         });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(errorMessage(error));
     }
   };
 

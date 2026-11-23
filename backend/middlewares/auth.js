@@ -14,6 +14,9 @@ export const isAdminAuthenticated = catchAsyncErrors(
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     req.user = await User.findById(decoded.id);
+    if (!req.user) {
+      return next(new ErrorHandler("Account no longer exists!", 401));
+    }
     if (req.user.role !== "Admin") {
       return next(
         new ErrorHandler(`${req.user.role} not authorized for this resource!`, 403)
@@ -32,6 +35,9 @@ export const isPatientAuthenticated = catchAsyncErrors(
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     req.user = await User.findById(decoded.id);
+    if (!req.user) {
+      return next(new ErrorHandler("Account no longer exists!", 401));
+    }
     if (req.user.role !== "Patient") {
       return next(
         new ErrorHandler(`${req.user.role} not authorized for this resource!`, 403)

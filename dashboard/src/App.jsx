@@ -1,4 +1,5 @@
-import React, { useContext, useEffect } from "react";
+import { API_URL } from "./api";
+import React, { useContext, useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -22,11 +23,13 @@ const App = () => {
   const { isAuthenticated, setIsAuthenticated, admin, setAdmin } =
     useContext(Context);
 
+  const [checked, setChecked] = useState(false);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/v1/user/admin/me",
+          `${API_URL}/api/v1/user/admin/me`,
           {
             withCredentials: true,
           }
@@ -36,10 +39,15 @@ const App = () => {
       } catch (error) {
         setIsAuthenticated(false);
         setAdmin({});
+      } finally {
+        setChecked(true);
       }
     };
     fetchUser();
   }, [isAuthenticated]);
+
+  // Wait for the session check, otherwise a page refresh looks like a logout.
+  if (!checked) return <p style={{ padding: "2rem" }}>Loading…</p>;
 
   return (
     <Router>

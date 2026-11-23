@@ -1,3 +1,4 @@
+import { API_URL, errorMessage } from "../api";
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../main";
 import { Navigate } from "react-router-dom";
@@ -7,27 +8,42 @@ import { GoCheckCircleFill } from "react-icons/go";
 import { AiFillCloseCircle } from "react-icons/ai";
 
 const Dashboard = () => {
+  const { isAuthenticated, admin } = useContext(Context);
   const [appointments, setAppointments] = useState([]);
+  const [doctorCount, setDoctorCount] = useState(null);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     const fetchAppointments = async () => {
       try {
         const { data } = await axios.get(
-          "http://localhost:5000/api/v1/appointment/getall",
+          `${API_URL}/api/v1/appointment/getall`,
           { withCredentials: true }
         );
         setAppointments(data.appointments);
       } catch (error) {
         setAppointments([]);
+        toast.error(errorMessage(error));
+      }
+    };
+    const fetchDoctorCount = async () => {
+      try {
+        const { data } = await axios.get(`${API_URL}/api/v1/user/doctors`, {
+          withCredentials: true,
+        });
+        setDoctorCount(data.doctors.length);
+      } catch (error) {
+        setDoctorCount(null);
       }
     };
     fetchAppointments();
-  }, []);
+    fetchDoctorCount();
+  }, [isAuthenticated]);
 
   const handleUpdateStatus = async (appointmentId, status) => {
     try {
       const { data } = await axios.put(
-        `http://localhost:5000/api/v1/appointment/update/${appointmentId}`,
+        `${API_URL}/api/v1/appointment/update/${appointmentId}`,
         { status },
         { withCredentials: true }
       );
@@ -40,11 +56,10 @@ const Dashboard = () => {
       );
       toast.success(data.message);
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(errorMessage(error));
     }
   };
 
-  const { isAuthenticated, admin } = useContext(Context);
   if (!isAuthenticated) {
     return <Navigate to={"/login"} />;
   }
@@ -64,19 +79,18 @@ const Dashboard = () => {
                 </h5>
               </div>
               <p>
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                Facilis, nam molestias. Eaque molestiae ipsam commodi neque.
-                Assumenda repellendus necessitatibus itaque.
+                Review new appointments, manage doctors and read patient
+                messages from here.
               </p>
             </div>
           </div>
           <div className="secondBox">
             <p>Total Appointments</p>
-            <h3>1500</h3>
+            <h3>{appointments.length}</h3>
           </div>
           <div className="thirdBox">
             <p>Registered Doctors</p>
-            <h3>10</h3>
+            <h3>{doctorCount ?? "–"}</h3>
           </div>
         </div>
         <div className="banner">
@@ -128,7 +142,11 @@ const Dashboard = () => {
                       <td>{appointment.hasVisited === true ? <GoCheckCircleFill className="green"/> : <AiFillCloseCircle className="red"/>}</td>
                     </tr>
                   ))
-                : "No Appointments Found!"}
+                : (
+                  <tr>
+                    <td colSpan={6}>No Appointments Found!</td>
+                  </tr>
+                )}
             </tbody>
           </table>
 

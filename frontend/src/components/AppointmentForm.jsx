@@ -1,3 +1,4 @@
+import { API_URL, errorMessage } from "../api";
 import axios from "axios";
 import React, { useEffect } from "react";
 import { useState } from "react";
@@ -33,12 +34,14 @@ const AppointmentForm = () => {
   const [doctors, setDoctors] = useState([]);
   useEffect(() => {
     const fetchDoctors = async () => {
-      const { data } = await axios.get(
-        "http://localhost:5000/api/v1/user/doctors",
-        { withCredentials: true }
-      );
-      setDoctors(data.doctors);
-      console.log(data.doctors);
+      try {
+        const { data } = await axios.get(`${API_URL}/api/v1/user/doctors`, {
+          withCredentials: true,
+        });
+        setDoctors(data.doctors);
+      } catch (error) {
+        toast.error(errorMessage(error));
+      }
     };
     fetchDoctors();
   }, []);
@@ -47,7 +50,7 @@ const AppointmentForm = () => {
     try {
       const hasVisitedBool = Boolean(hasVisited);
       const { data } = await axios.post(
-        "http://localhost:5000/api/v1/appointment/post",
+        `${API_URL}/api/v1/appointment/post`,
         {
           firstName,
           lastName,
@@ -77,13 +80,13 @@ const AppointmentForm = () => {
         setDob(""),
         setGender(""),
         setAppointmentDate(""),
-        setDepartment(""),
+        setDepartment("Pediatrics"),
         setDoctorFirstName(""),
         setDoctorLastName(""),
-        setHasVisited(""),
+        setHasVisited(false),
         setAddress("");
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(errorMessage(error));
     }
   };
 
@@ -197,7 +200,9 @@ const AppointmentForm = () => {
               }}
               disabled={!department}
             >
-              <option value="">Select Doctor</option>
+              <option value={JSON.stringify({ firstName: "", lastName: "" })}>
+                Select Doctor
+              </option>
               {doctors
                 .filter((doctor) => doctor.doctorDepartment === department)
                 .map((doctor, index) => (
